@@ -13,49 +13,29 @@ services:
       context: .docker/php
       # Overrides build arguments, which are environment variables accessible only during the build process.
       args:
-        - DOCKER_PHP_VERSION=7.1
-        - DOCKER_APACHE_RUN_USER=www-data
-        - DOCKER_APACHE_RUN_GROUP=www-data
-        - DOCKER_APACHE_RUN_UID=33
-        - DOCKER_APACHE_RUN_GID=33
+        - DOCKER_PHP_VERSION=7.3
+        - DOCKER_APACHE_RUN_USER=pictonio
+        - DOCKER_APACHE_RUN_GROUP=pictonio
+        - DOCKER_APACHE_RUN_UID=1000
+        - DOCKER_APACHE_RUN_GID=1001
     # Expose ports.
     ports:
-      - "80"
+      - "8080:80"
     # Link to containers in another service.
-    links:
-      - db:percona
+#    links:
+#      - db:percona
     # Mount host paths or named volumes.
     volumes:
       # Host path volume for project docroot.
-      - ./data/apache:/var/www/html
+      - /data/drupal/apache:/var/www/html
       # Host path volume for php.ini configuration file.
       - ./conf/php.ini:/usr/local/etc/php/php.ini
       # Host path volume for apache default.conf file.
       - ./conf/apache.conf:/etc/apache2/sites-available/000-default.conf
+      # MPM config
+      - ./conf/mpm_prefork.conf:/etc/apache2/mods-available/mpm_prefork.conf
+    restart: always
   # Docker db service.
-  db:
-    # Specify the image to start the container from.
-    image: percona
-    # Expose ports
-    ports:
-      - "3306"
-    # Mount host paths or named volumes.
-    volumes:
-      # Named volume for percona data.
-      - percona_data:/var/lib/mysql
-      # Host path volume for docker-entrypoint-initdb.d folder.
-      # Percona import sql dumps from this folder if database is not created.
-      - ./data/mysql/import:/docker-entrypoint-initdb.d
-      # Host path volume for percona custom configuration file.
-      - ./conf/my.cnf:/etc/mysql/percona-server.conf.d/mysql_custom.cnf
-    # Add environment variables.
-    # Percona enviroment variables. 
-    # Check https://hub.docker.com/_/percona/ for more information.
-    environment:
-      - MYSQL_ROOT_PASSWORD=db
-      - MYSQL_DATABASE=db
-      - MYSQL_USER=db
-      - MYSQL_PASSWORD=db
 
 # Named volumes
 volumes:

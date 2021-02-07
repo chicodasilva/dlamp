@@ -20,7 +20,8 @@ RUN  apt-get update \
     libicu-dev \
     libxml2-dev \
     libxslt-dev \
-    mysql-client \
+    mariadb-client \
+    libzip-dev \
     curl \
     git \
     vim \
@@ -34,13 +35,13 @@ RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-di
 RUN docker-php-ext-install gd json mbstring pdo pdo_mysql mysqli zip opcache intl xsl
     
 # INSTALL XDEBUG
-RUN pecl install xdebug
+#RUN pecl install xdebug
 
 # SET XDEBUG CONFIGURATION
-RUN echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_enable=on\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_autostart=off\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_port=9000\n" >> /usr/local/etc/php/conf.d/xdebug.ini
+#RUN echo "zend_extension=$(find /usr/local/lib/php/extensions/ -name xdebug.so)\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
+#    && echo "xdebug.remote_enable=on\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
+#    && echo "xdebug.remote_autostart=off\n" >> /usr/local/etc/php/conf.d/xdebug.ini \
+#    && echo "xdebug.remote_port=9000\n" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 # VALIDATE AND INSTALL COMPOSER
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
@@ -50,10 +51,10 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
   && php -r "unlink('composer-setup.php'); unlink('installer.sig');"
 
 # BUILD ARGUMENTS
-ARG DOCKER_APACHE_RUN_USER=www-data
-ARG DOCKER_APACHE_RUN_GROUP=www-data
-ARG DOCKER_APACHE_RUN_UID=33
-ARG DOCKER_APACHE_RUN_GID=33
+ARG DOCKER_APACHE_RUN_USER=pictonio
+ARG DOCKER_APACHE_RUN_GROUP=pictonio
+ARG DOCKER_APACHE_RUN_UID=1000
+ARG DOCKER_APACHE_RUN_GID=1001
 
 # ENVIRONMENT VARIABLES
 ENV APACHE_RUN_USER=$DOCKER_APACHE_RUN_USER
